@@ -4,35 +4,37 @@ import (
 	"testing"
 )
 
-type (
-	doTestInfo struct {
-		in  string
-		out string
+func TestConvert(t *testing.T) {
+	type args struct {
+		val string
 	}
-)
-
-var (
-	doTestValues = []doTestInfo{
-		doTestInfo{"255", "0xFF"},
-		doTestInfo{"10", "0xA"},
-		doTestInfo{"0", "0x0"},
-		doTestInfo{"", ""},
+	tests := []struct {
+		name            string
+		args            args
+		want            string
+		errShouldRaised bool
+	}{
+		{name: "empty", args: args{val: ""}, want: "", errShouldRaised: false},
+		{name: "255 to 0xFF", args: args{val: "255"}, want: "0xFF", errShouldRaised: false},
 	}
-)
 
-func TestDo(t *testing.T) {
-	for _, d := range doTestValues {
-		// Arrange
-		// Act
-		got, err := Do(d.in)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := Convert(tt.args.val)
 
-		// Assert
-		if err != nil {
-			t.Error(err)
-		}
+			if got != tt.want {
+				t.Errorf("got %v, want %v", got, tt.want)
+			}
 
-		if d.out != got {
-			t.Errorf("want: %v, but got:%v\n", d.out, got)
-		}
+			if tt.errShouldRaised {
+				if err == nil {
+					t.Errorf("should raise err but err is nil")
+				}
+			} else {
+				if err != nil {
+					t.Errorf("err = %v", err)
+				}
+			}
+		})
 	}
 }
